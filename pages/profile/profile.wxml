@@ -1,9 +1,12 @@
 <view class="page-profile">
   <!-- ===== User Header ===== -->
   <view class="profile-header">
-    <view class="avatar">M</view>
-    <text class="username">小明</text>
-    <text class="user-stats">已使用 23 天 · 换算 156 次</text>
+    <view class="avatar {{userInfo.avatarUrl ? 'has-img' : ''}}">
+      <image wx:if="{{userInfo.avatarUrl}}" class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+      <text wx:else>{{initial}}</text>
+    </view>
+    <text class="username">{{userInfo.nickName || '未登录'}}</text>
+    <text class="user-stats">已使用 {{usedDays}} 天 · 换算 {{convertCount}} 次</text>
   </view>
 
   <!-- ===== Pro Card ===== -->
@@ -66,6 +69,14 @@
       <text class="menu-text">设置</text>
       <text class="menu-arrow">›</text>
     </view>
+  </view>
+
+  <!-- ===== Logout / Login ===== -->
+  <view class="logout-btn" bindtap="onLogout" wx:if="{{loggedIn}}">
+    <text>退出登录</text>
+  </view>
+  <view class="logout-btn login-entry" bindtap="onLogin" wx:else>
+    <text>登录 / 切换账号</text>
   </view>
 
   <!-- ===== App Info ===== -->
