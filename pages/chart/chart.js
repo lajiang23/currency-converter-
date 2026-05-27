@@ -1,4 +1,5 @@
 const api = require('../../utils/api');
+const i18n = require('../../utils/i18n');
 
 Page({
   data: {
@@ -16,16 +17,24 @@ Page({
     rsi: '',
     volatility: '',
     chartData: null,
-    canvasReady: false
+    canvasReady: false,
+    lang: i18n.getLang(),
+    _: i18n.getAllStrings()
   },
 
   onLoad() {
     this.loadData();
   },
 
+  onShow() {
+    const lang = i18n.getLang();
+    if (lang !== this.data.lang) {
+      this.setData({ lang, _: i18n.getAllStrings() });
+    }
+  },
+
   onReady() {
     this.setData({ canvasReady: true });
-    // Draw after layout — try, then retry on next frame if canvas not ready
     wx.nextTick(() => {
       if (this.data.chartData) this.drawChart();
     });
@@ -36,7 +45,6 @@ Page({
     const points = data.points;
     const values = points.map(p => p.value);
 
-    // Technical indicators
     const ma5 = this.calcMA(values, 5);
     const ma20 = this.calcMA(values, 20);
     const rsi = this.calcRSI(values, 14);
@@ -128,7 +136,6 @@ Page({
     const chartW = w - pad.left - pad.right;
     const chartH = h - pad.top - pad.bottom;
 
-    // Map data to pixel coordinates
     const toX = (i) => pad.left + (i / (values.length - 1)) * chartW;
     const toY = (v) => pad.top + (1 - (v - min) / range) * chartH;
 
@@ -228,7 +235,6 @@ Page({
     });
   },
 
-  // ===== Tab Navigation =====
   onTabTap(e) {
     const tab = e.currentTarget.dataset.tab;
     const pages = {

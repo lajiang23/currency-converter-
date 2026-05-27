@@ -1,4 +1,5 @@
 const api = require('../../utils/api');
+const i18n = require('../../utils/i18n');
 
 const SELECTED_KEY = 'selected_currencies';
 const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
@@ -6,10 +7,12 @@ const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
 Page({
   data: {
     currencies: [],
-    checkedCount: 0
+    checkedCount: 0,
+    _: i18n.getAllStrings()
   },
 
   onLoad() {
+    this.setData({ _: i18n.getAllStrings() });
     this.buildList();
   },
 
@@ -21,7 +24,11 @@ Page({
       checked: selected.includes(c.code)
     }));
     const count = list.filter(c => c.checked).length;
-    this.setData({ currencies: list, checkedCount: count });
+    this.setData({
+      currencies: list,
+      checkedCount: count,
+      selectedCountLabel: i18n.t('selected_count', count)
+    });
   },
 
   onToggle(e) {
@@ -35,7 +42,11 @@ Page({
       }
       return c;
     });
-    this.setData({ currencies: list, checkedCount: count });
+    this.setData({
+      currencies: list,
+      checkedCount: count,
+      selectedCountLabel: i18n.t('selected_count', count)
+    });
   },
 
   onConfirm() {

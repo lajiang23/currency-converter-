@@ -3,10 +3,13 @@
   <view class="base-section">
     <view class="base-top">
       <view class="base-top-left">
-        <text class="base-label">基准货币</text>
+        <text class="base-label">{{_.base_currency}}</text>
+        <view class="lang-switch" bindtap="onToggleLang">
+          <text class="lang-text">{{lang === 'en' ? 'EN' : '中'}}</text>
+        </view>
       </view>
       <view class="base-change" bindtap="onChangeBase">
-        <text>更换</text>
+        <text>{{_.change}}</text>
         <text class="base-change-icon">›</text>
       </view>
     </view>
@@ -30,11 +33,12 @@
   <!-- ===== Conversion List ===== -->
   <scroll-view class="conversion-list" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="list-header">
-      <text class="list-header-title">货币换算</text>
-      <text class="list-header-count">{{displayCurrencies.length}} 种货币</text>
+      <text class="list-header-title">{{_.currency_converter}}</text>
+      <text class="list-header-count">{{displayCurrencies.length}} {{_.currencies_count}}</text>
     </view>
 
-    <view class="conv-item" wx:for="{{displayCurrencies}}" wx:key="code">
+    <view class="conv-item" wx:for="{{displayCurrencies}}" wx:key="code"
+      data-code="{{item.code}}" bindlongpress="onDeleteCurrency">
       <view class="conv-left">
         <image wx:if="{{item.flagUrl}}" class="conv-flag" src="{{item.flagUrl}}" mode="aspectFit" />
         <view wx:else class="conv-flag flag-fallback">{{item.code.charAt(0)}}</view>
@@ -58,16 +62,21 @@
     <!-- Empty state -->
     <view class="empty-state" wx:if="{{displayCurrencies.length === 0}}">
       <text class="empty-icon">💱</text>
-      <text class="empty-text">还没有添加货币</text>
-      <text class="empty-sub">点击下方按钮添加关注的币种</text>
+      <text class="empty-text">{{_.no_currencies}}</text>
+      <text class="empty-sub">{{_.no_currencies_sub}}</text>
     </view>
 
     <!-- Add currency button -->
     <view class="add-btn-wrap">
       <view class="add-btn" bindtap="onAddCurrency">
         <text class="add-icon">+</text>
-        <text class="add-text">添加货币</text>
+        <text class="add-text">{{_.add_currency}}</text>
       </view>
+    </view>
+
+    <!-- ===== WeChat Banner Ad ===== -->
+    <view class="ad-wrap" wx:if="{{adUnitId}}">
+      <ad unit-id="{{adUnitId}}" ad-intervals="{{60}}" bindload="onAdLoad" binderror="onAdError"></ad>
     </view>
   </scroll-view>
 
@@ -75,17 +84,18 @@
   <view class="update-bar">
     <text class="update-dot"></text>
     <text>{{updateTime}}</text>
+    <text class="lang-indicator" bindtap="onToggleLang">{{lang === 'en' ? '中文' : 'English'}}</text>
   </view>
 
   <!-- ===== Currency Picker Bottom Sheet ===== -->
   <view class="modal-mask" wx:if="{{showPicker}}" bindtap="onPickerClose"></view>
   <view class="picker-sheet {{showPicker ? 'show' : ''}}">
     <view class="picker-header">
-      <text class="picker-title">选择基准货币</text>
+      <text class="picker-title">{{_.select_base}}</text>
       <view class="picker-close" bindtap="onPickerClose">✕</view>
     </view>
     <view class="picker-current" wx:if="{{baseCurrency}}">
-      <text class="pc-label">当前基准</text>
+      <text class="pc-label">{{_.current_base}}</text>
       <image wx:if="{{baseCurrency.flagUrl}}" class="pc-flag" src="{{baseCurrency.flagUrl}}" mode="aspectFit" />
       <view wx:else class="pc-flag flag-fallback">{{baseCurrency.code.charAt(0)}}</view>
       <text class="pc-code">{{baseCurrency.code}}</text>

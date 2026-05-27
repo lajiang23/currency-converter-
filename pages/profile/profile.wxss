@@ -14,20 +14,12 @@
   justify-content: center;
   font-size: 44rpx;
   color: #fff;
-  font-weight: 700;
-  overflow: hidden;
-}
-.avatar.has-img {
-  background: var(--bg);
-}
-.avatar-img {
-  width: 100%;
-  height: 100%;
 }
 .username {
   font-size: 34rpx;
   font-weight: 700;
   display: block;
+  color: var(--text);
 }
 .user-stats {
   font-size: 24rpx;
@@ -128,25 +120,6 @@
 .menu-arrow {
   color: var(--text-tertiary);
   font-size: 28rpx;
-}
-
-/* ===== Logout ===== */
-.logout-btn {
-  margin: 0 20rpx 16rpx;
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 24rpx;
-  text-align: center;
-  font-size: 28rpx;
-  color: var(--red);
-  font-weight: 500;
-  box-shadow: var(--shadow);
-}
-.logout-btn:active {
-  opacity: 0.6;
-}
-.logout-btn.login-entry {
-  color: var(--primary);
 }
 
 /* ===== App Info ===== */

@@ -1,43 +1,32 @@
-const auth = require('../../utils/auth');
-const util = require('../../utils/util');
+const i18n = require('../../utils/i18n');
 
 Page({
   data: {
-    userInfo: { nickName: '未登录' },
-    initial: 'M',
-    loggedIn: false,
-    usedDays: 0,
-    convertCount: 0
+    lang: i18n.getLang(),
+    _: i18n.getAllStrings()
   },
 
   onShow() {
-    this.loadUserData();
-  },
-
-  loadUserData() {
-    const user = auth.loadUserInfo();
-    if (user) {
-      const days = Math.floor((Date.now() - user.loginTime) / 86400000) || 1;
-      const initial = user.nickName ? user.nickName.charAt(0).toUpperCase() : 'M';
-      this.setData({
-        userInfo: user,
-        initial,
-        loggedIn: true,
-        usedDays: days,
-        convertCount: days * 6 + Math.floor(Math.random() * 10)
-      });
+    const lang = i18n.getLang();
+    if (lang !== this.data.lang) {
+      this.setData({ lang, _: i18n.getAllStrings() });
     }
   },
 
   onProTap() {
     wx.showModal({
-      title: 'Pro 会员',
-      content: '去广告 · 无限预警 · 历史数据导出 · VIP 走势\n\n¥9.9/月 或 ¥68/年',
-      confirmText: '立即开通',
-      cancelText: '再看看',
+      title: 'Pro',
+      content: this.data.lang === 'en'
+        ? 'Ad-free · Unlimited Alerts · Data Export · VIP Charts\n\n¥9.9/mo or ¥68/yr'
+        : '去广告 · 无限预警 · 历史数据导出 · VIP 走势\n\n¥9.9/月 或 ¥68/年',
+      confirmText: this.data.lang === 'en' ? 'Subscribe' : '立即开通',
+      cancelText: this.data.lang === 'en' ? 'Cancel' : '再看看',
       success: (res) => {
         if (res.confirm) {
-          util.showToast('即将开通，敬请期待');
+          wx.showToast({
+            title: this.data.lang === 'en' ? 'Coming soon' : '即将开通，敬请期待',
+            icon: 'none'
+          });
         }
       }
     });
@@ -46,41 +35,15 @@ Page({
   onMenuTap(e) {
     const action = e.currentTarget.dataset.action;
     const titles = {
-      alerts: '汇率预警',
-      favorites: '收藏货币',
-      history: '历史记录',
-      export: '数据导出',
-      knowledge: '汇率知识',
-      settings: '设置'
+      alerts: this.data.lang === 'en' ? 'Rate Alerts' : '汇率预警',
+      favorites: this.data.lang === 'en' ? 'Favorite Currencies' : '收藏货币',
+      history: this.data.lang === 'en' ? 'History' : '历史记录',
+      export: this.data.lang === 'en' ? 'Export Data' : '数据导出',
+      knowledge: this.data.lang === 'en' ? 'Rate Knowledge' : '汇率知识',
+      settings: this.data.lang === 'en' ? 'Settings' : '设置'
     };
-    util.showToast((titles[action] || action) + '（开发中）');
-  },
-
-  onLogin() {
-    wx.reLaunch({ url: '/pages/login/login' });
-  },
-
-  onLogout() {
-    wx.showModal({
-      title: '退出登录',
-      content: '确定要退出当前账号吗？',
-      cancelText: '取消',
-      confirmText: '退出',
-      confirmColor: '#EF4444',
-      success: (res) => {
-        if (res.confirm) {
-          auth.logout();
-          this.setData({
-            userInfo: { nickName: '未登录' },
-            initial: 'M',
-            loggedIn: false,
-            usedDays: 0,
-            convertCount: 0
-          });
-          wx.reLaunch({ url: '/pages/login/login' });
-        }
-      }
-    });
+    const dev = this.data.lang === 'en' ? ' (Coming Soon)' : '（开发中）';
+    wx.showToast({ title: titles[action] + dev, icon: 'none', duration: 1500 });
   },
 
   onTabTap(e) {

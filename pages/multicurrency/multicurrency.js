@@ -1,4 +1,5 @@
 const api = require('../../utils/api');
+const i18n = require('../../utils/i18n');
 
 Page({
   data: {
@@ -7,11 +8,28 @@ Page({
     baseSymbol: '¥',
     currencies: [],
     displayList: [],
-    searchQuery: ''
+    searchQuery: '',
+    lang: i18n.getLang(),
+    _: i18n.getAllStrings()
   },
 
   onLoad() {
     this.buildList();
+    this.updateLabels();
+  },
+
+  updateLabels() {
+    this.setData({
+      baseAmountLabel: i18n.t('base_amount', this.data.baseCurrency.code)
+    });
+  },
+
+  onShow() {
+    const lang = i18n.getLang();
+    if (lang !== this.data.lang) {
+      this.setData({ lang, _: i18n.getAllStrings() });
+      this.updateLabels();
+    }
   },
 
   buildList() {
@@ -22,6 +40,7 @@ Page({
       const decimals = val >= 1000 ? 2 : (val >= 1 ? 4 : 6);
       return {
         ...c,
+        flagUrl: api.getFlagUrl(c.code),
         formatted: val.toFixed(decimals),
         changePct: c.change,
         changeUp: c.changeUp

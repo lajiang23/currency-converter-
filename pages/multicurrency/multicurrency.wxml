@@ -1,7 +1,7 @@
 <view class="page-multi">
   <!-- ===== Header Amount ===== -->
   <view class="multi-header">
-    <view class="mh-label">基准金额 (<text class="mh-base">{{baseCurrency.code}}</text>)</view>
+    <view class="mh-label">{{baseAmountLabel}}</view>
     <view class="mh-input-row">
       <text class="mh-symbol">{{baseSymbol}}</text>
       <input class="mh-input" type="digit" value="{{baseAmount}}" bindinput="onBaseAmountChange" />
@@ -11,14 +11,15 @@
   <!-- ===== Search ===== -->
   <view class="search-box">
     <text class="search-icon">🔍</text>
-    <input class="search-input" placeholder="搜索货币名称或代码..." bindinput="onSearch" />
+    <input class="search-input" placeholder="{{_.search_placeholder}}" bindinput="onSearch" />
   </view>
 
   <!-- ===== Currency List ===== -->
   <scroll-view class="multi-list" scroll-y>
     <view class="multi-item" wx:for="{{displayList}}" wx:key="code"
       wx:for-item="item">
-      <text class="mi-flag">{{item.flag}}</text>
+      <image wx:if="{{item.flagUrl}}" class="mi-flag" src="{{item.flagUrl}}" mode="aspectFit" />
+      <view wx:else class="mi-flag flag-fallback">{{item.code.charAt(0)}}</view>
       <view class="mi-info">
         <text class="mi-code">{{item.code}}</text>
         <text class="mi-name">{{item.name}}</text>
@@ -34,7 +35,7 @@
     <!-- Empty state -->
     <view class="empty-state" wx:if="{{displayList.length === 0}}">
       <text class="empty-icon">🔍</text>
-      <text class="empty-text">未找到匹配的货币</text>
+      <text class="empty-text">{{_.no_results}}</text>
     </view>
   </scroll-view>
 
@@ -42,19 +43,19 @@
   <view class="tab-bar">
     <view class="tab-item" data-tab="index" bindtap="onTabTap">
       <text class="tab-icon">🏠</text>
-      <text class="tab-label">首页</text>
+      <text class="tab-label">{{_.tab_home}}</text>
     </view>
     <view class="tab-item active" data-tab="multicurrency" bindtap="onTabTap">
       <text class="tab-icon">💱</text>
-      <text class="tab-label">多币种</text>
+      <text class="tab-label">{{_.tab_multicurrency}}</text>
     </view>
     <view class="tab-item" data-tab="chart" bindtap="onTabTap">
       <text class="tab-icon">📈</text>
-      <text class="tab-label">走势</text>
+      <text class="tab-label">{{_.tab_chart}}</text>
     </view>
     <view class="tab-item" data-tab="profile" bindtap="onTabTap">
       <text class="tab-icon">👤</text>
-      <text class="tab-label">我的</text>
+      <text class="tab-label">{{_.tab_profile}}</text>
     </view>
   </view>
 </view>
