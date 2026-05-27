@@ -82,3 +82,24 @@ button::after {
   align-items: center;
   justify-content: space-between;
 }
+
+/* ===== Flag Image ===== */
+.flag-img {
+  width: 44rpx;
+  height: 33rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
+}
+.flag-fallback {
+  width: 44rpx;
+  height: 33rpx;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 20rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

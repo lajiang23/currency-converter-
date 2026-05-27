@@ -7,7 +7,8 @@
     </view>
     <view class="base-main">
       <view class="base-left">
-        <text class="base-flag">{{baseCurrency.flag}}</text>
+        <image wx:if="{{baseCurrency.flagUrl}}" class="base-flag" src="{{baseCurrency.flagUrl}}" mode="aspectFit" />
+        <view wx:else class="base-flag flag-fallback">{{baseCurrency.code.charAt(0)}}</view>
         <view class="base-info">
           <text class="base-code">{{baseCurrency.code}}</text>
           <text class="base-name">{{baseCurrency.name}} {{baseSymbol}}</text>
@@ -24,7 +25,8 @@
   <scroll-view class="conversion-list" scroll-y>
     <view class="conv-item" wx:for="{{displayCurrencies}}" wx:key="code">
       <view class="conv-left">
-        <text class="conv-flag">{{item.flag}}</text>
+        <image wx:if="{{item.flagUrl}}" class="conv-flag" src="{{item.flagUrl}}" mode="aspectFit" />
+        <view wx:else class="conv-flag flag-fallback">{{item.code.charAt(0)}}</view>
         <view class="conv-info">
           <text class="conv-code">{{item.code}}</text>
           <text class="conv-name">{{item.name}} {{item.symbol}}</text>
@@ -53,7 +55,8 @@
     <scroll-view class="picker-list" scroll-y>
       <view class="picker-item" wx:for="{{currencies}}" wx:key="code"
         data-code="{{item.code}}" bindtap="onPickerSelect">
-        <text class="pi-flag">{{item.flag}}</text>
+        <image wx:if="{{item.flagUrl}}" class="pi-flag" src="{{item.flagUrl}}" mode="aspectFit" />
+        <view wx:else class="pi-flag flag-fallback">{{item.code.charAt(0)}}</view>
         <view class="pi-info">
           <text class="pi-code">{{item.code}}</text>
           <text class="pi-name">{{item.name}} · {{item.symbol}}</text>

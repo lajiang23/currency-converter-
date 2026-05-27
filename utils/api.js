@@ -10,39 +10,41 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const KEY_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'HKD', 'KRW', 'AUD', 'THB'];
 
 // ===== Currency Definitions =====
+// flagCountry: ISO 3166-1 alpha-2 code for flagcdn.com
+// flagUrl: empty = use fallback circle icon
 const CURRENCIES = [
-  { code: 'USD', name: '美元', full: 'US Dollar', flag: '\u{1F1FA}\u{1F1F8}', symbol: '$' },
-  { code: 'EUR', name: '欧元', full: 'Euro', flag: '\u{1F1EA}\u{1F1FA}', symbol: '€' },
-  { code: 'GBP', name: '英镑', full: 'British Pound', flag: '\u{1F1EC}\u{1F1E7}', symbol: '£' },
-  { code: 'JPY', name: '日元', full: 'Japanese Yen', flag: '\u{1F1EF}\u{1F1F5}', symbol: '¥' },
-  { code: 'KRW', name: '韩元', full: 'South Korean Won', flag: '\u{1F1F0}\u{1F1F7}', symbol: '₩' },
-  { code: 'HKD', name: '港币', full: 'Hong Kong Dollar', flag: '\u{1F1ED}\u{1F1F0}', symbol: 'HK$' },
-  { code: 'TWD', name: '新台币', full: 'Taiwan Dollar', flag: '\u{1F310}', symbol: 'NT$' },
-  { code: 'SGD', name: '新加坡元', full: 'Singapore Dollar', flag: '\u{1F1F8}\u{1F1EC}', symbol: 'S$' },
-  { code: 'AUD', name: '澳元', full: 'Australian Dollar', flag: '\u{1F1E6}\u{1F1FA}', symbol: 'A$' },
-  { code: 'CAD', name: '加元', full: 'Canadian Dollar', flag: '\u{1F1E8}\u{1F1E6}', symbol: 'C$' },
-  { code: 'CHF', name: '瑞士法郎', full: 'Swiss Franc', flag: '\u{1F1E8}\u{1F1ED}', symbol: 'Fr' },
-  { code: 'THB', name: '泰铢', full: 'Thai Baht', flag: '\u{1F1F9}\u{1F1ED}', symbol: '฿' },
-  { code: 'MYR', name: '马来西亚林吉特', full: 'Malaysian Ringgit', flag: '\u{1F1F2}\u{1F1FE}', symbol: 'RM' },
-  { code: 'VND', name: '越南盾', full: 'Vietnamese Dong', flag: '\u{1F1FB}\u{1F1F3}', symbol: '₫' },
-  { code: 'PHP', name: '菲律宾比索', full: 'Philippine Peso', flag: '\u{1F1F5}\u{1F1ED}', symbol: '₱' },
-  { code: 'IDR', name: '印尼盾', full: 'Indonesian Rupiah', flag: '\u{1F1EE}\u{1F1E9}', symbol: 'Rp' },
-  { code: 'INR', name: '印度卢比', full: 'Indian Rupee', flag: '\u{1F1EE}\u{1F1F3}', symbol: '₹' },
-  { code: 'RUB', name: '俄罗斯卢布', full: 'Russian Ruble', flag: '\u{1F1F7}\u{1F1FA}', symbol: '₽' },
-  { code: 'NZD', name: '新西兰元', full: 'New Zealand Dollar', flag: '\u{1F1F3}\u{1F1FF}', symbol: 'NZ$' },
-  { code: 'MOP', name: '澳门元', full: 'Macanese Pataca', flag: '\u{1F1F2}\u{1F1F4}', symbol: 'MOP$' },
-  { code: 'SEK', name: '瑞典克朗', full: 'Swedish Krona', flag: '\u{1F1F8}\u{1F1EA}', symbol: 'kr' },
-  { code: 'NOK', name: '挪威克朗', full: 'Norwegian Krone', flag: '\u{1F1F3}\u{1F1F4}', symbol: 'kr' },
-  { code: 'DKK', name: '丹麦克朗', full: 'Danish Krone', flag: '\u{1F1E9}\u{1F1F0}', symbol: 'kr' },
-  { code: 'ZAR', name: '南非兰特', full: 'South African Rand', flag: '\u{1F1FF}\u{1F1E6}', symbol: 'R' },
-  { code: 'TRY', name: '土耳其里拉', full: 'Turkish Lira', flag: '\u{1F1F9}\u{1F1F7}', symbol: '₺' },
-  { code: 'SAR', name: '沙特里亚尔', full: 'Saudi Riyal', flag: '\u{1F1F8}\u{1F1E6}', symbol: '﷼' },
-  { code: 'AED', name: '阿联酋迪拉姆', full: 'UAE Dirham', flag: '\u{1F1E6}\u{1F1EA}', symbol: 'د.إ' },
-  { code: 'PLN', name: '波兰兹罗提', full: 'Polish Zloty', flag: '\u{1F1F5}\u{1F1F1}', symbol: 'zł' },
-  { code: 'MXN', name: '墨西哥比索', full: 'Mexican Peso', flag: '\u{1F1F2}\u{1F1FD}', symbol: 'MX$' },
-  { code: 'BRL', name: '巴西雷亚尔', full: 'Brazilian Real', flag: '\u{1F1E7}\u{1F1F7}', symbol: 'R$' },
-  { code: 'NGN', name: '尼日利亚奈拉', full: 'Nigerian Naira', flag: '\u{1F1F3}\u{1F1EC}', symbol: '₦' },
-  { code: 'CNY', name: '人民币', full: 'Chinese Yuan', flag: '\u{1F1E8}\u{1F1F3}', symbol: '¥' }
+  { code: 'USD', name: '美元', full: 'US Dollar', flag: '\u{1F1FA}\u{1F1F8}', symbol: '$', flagCountry: 'us' },
+  { code: 'EUR', name: '欧元', full: 'Euro', flag: '\u{1F1EA}\u{1F1FA}', symbol: '€', flagCountry: 'eu' },
+  { code: 'GBP', name: '英镑', full: 'British Pound', flag: '\u{1F1EC}\u{1F1E7}', symbol: '£', flagCountry: 'gb' },
+  { code: 'JPY', name: '日元', full: 'Japanese Yen', flag: '\u{1F1EF}\u{1F1F5}', symbol: '¥', flagCountry: 'jp' },
+  { code: 'KRW', name: '韩元', full: 'South Korean Won', flag: '\u{1F1F0}\u{1F1F7}', symbol: '₩', flagCountry: 'kr' },
+  { code: 'HKD', name: '港币', full: 'Hong Kong Dollar', flag: '\u{1F1ED}\u{1F1F0}', symbol: 'HK$', flagCountry: 'hk' },
+  { code: 'TWD', name: '新台币', full: 'Taiwan Dollar', flag: '', symbol: 'NT$', flagCountry: '' },
+  { code: 'SGD', name: '新加坡元', full: 'Singapore Dollar', flag: '\u{1F1F8}\u{1F1EC}', symbol: 'S$', flagCountry: 'sg' },
+  { code: 'AUD', name: '澳元', full: 'Australian Dollar', flag: '\u{1F1E6}\u{1F1FA}', symbol: 'A$', flagCountry: 'au' },
+  { code: 'CAD', name: '加元', full: 'Canadian Dollar', flag: '\u{1F1E8}\u{1F1E6}', symbol: 'C$', flagCountry: 'ca' },
+  { code: 'CHF', name: '瑞士法郎', full: 'Swiss Franc', flag: '\u{1F1E8}\u{1F1ED}', symbol: 'Fr', flagCountry: 'ch' },
+  { code: 'THB', name: '泰铢', full: 'Thai Baht', flag: '\u{1F1F9}\u{1F1ED}', symbol: '฿', flagCountry: 'th' },
+  { code: 'MYR', name: '马来西亚林吉特', full: 'Malaysian Ringgit', flag: '\u{1F1F2}\u{1F1FE}', symbol: 'RM', flagCountry: 'my' },
+  { code: 'VND', name: '越南盾', full: 'Vietnamese Dong', flag: '\u{1F1FB}\u{1F1F3}', symbol: '₫', flagCountry: 'vn' },
+  { code: 'PHP', name: '菲律宾比索', full: 'Philippine Peso', flag: '\u{1F1F5}\u{1F1ED}', symbol: '₱', flagCountry: 'ph' },
+  { code: 'IDR', name: '印尼盾', full: 'Indonesian Rupiah', flag: '\u{1F1EE}\u{1F1E9}', symbol: 'Rp', flagCountry: 'id' },
+  { code: 'INR', name: '印度卢比', full: 'Indian Rupee', flag: '\u{1F1EE}\u{1F1F3}', symbol: '₹', flagCountry: 'in' },
+  { code: 'RUB', name: '俄罗斯卢布', full: 'Russian Ruble', flag: '\u{1F1F7}\u{1F1FA}', symbol: '₽', flagCountry: 'ru' },
+  { code: 'NZD', name: '新西兰元', full: 'New Zealand Dollar', flag: '\u{1F1F3}\u{1F1FF}', symbol: 'NZ$', flagCountry: 'nz' },
+  { code: 'MOP', name: '澳门元', full: 'Macanese Pataca', flag: '\u{1F1F2}\u{1F1F4}', symbol: 'MOP$', flagCountry: 'mo' },
+  { code: 'SEK', name: '瑞典克朗', full: 'Swedish Krona', flag: '\u{1F1F8}\u{1F1EA}', symbol: 'kr', flagCountry: 'se' },
+  { code: 'NOK', name: '挪威克朗', full: 'Norwegian Krone', flag: '\u{1F1F3}\u{1F1F4}', symbol: 'kr', flagCountry: 'no' },
+  { code: 'DKK', name: '丹麦克朗', full: 'Danish Krone', flag: '\u{1F1E9}\u{1F1F0}', symbol: 'kr', flagCountry: 'dk' },
+  { code: 'ZAR', name: '南非兰特', full: 'South African Rand', flag: '\u{1F1FF}\u{1F1E6}', symbol: 'R', flagCountry: 'za' },
+  { code: 'TRY', name: '土耳其里拉', full: 'Turkish Lira', flag: '\u{1F1F9}\u{1F1F7}', symbol: '₺', flagCountry: 'tr' },
+  { code: 'SAR', name: '沙特里亚尔', full: 'Saudi Riyal', flag: '\u{1F1F8}\u{1F1E6}', symbol: '﷼', flagCountry: 'sa' },
+  { code: 'AED', name: '阿联酋迪拉姆', full: 'UAE Dirham', flag: '\u{1F1E6}\u{1F1EA}', symbol: 'د.إ', flagCountry: 'ae' },
+  { code: 'PLN', name: '波兰兹罗提', full: 'Polish Zloty', flag: '\u{1F1F5}\u{1F1F1}', symbol: 'zł', flagCountry: 'pl' },
+  { code: 'MXN', name: '墨西哥比索', full: 'Mexican Peso', flag: '\u{1F1F2}\u{1F1FD}', symbol: 'MX$', flagCountry: 'mx' },
+  { code: 'BRL', name: '巴西雷亚尔', full: 'Brazilian Real', flag: '\u{1F1E7}\u{1F1F7}', symbol: 'R$', flagCountry: 'br' },
+  { code: 'NGN', name: '尼日利亚奈拉', full: 'Nigerian Naira', flag: '\u{1F1F3}\u{1F1EC}', symbol: '₦', flagCountry: 'ng' },
+  { code: 'CNY', name: '人民币', full: 'Chinese Yuan', flag: '\u{1F1E8}\u{1F1F3}', symbol: '¥', flagCountry: 'cn' }
 ];
 
 // Fallback reference rates (1 CNY = X)
@@ -60,6 +62,14 @@ const FALLBACK_RATES = {
 // ===== Helpers =====
 function getCurrency(code) {
   return CURRENCIES.find(c => c.code === code);
+}
+
+function getFlagUrl(code) {
+  const c = getCurrency(code);
+  if (c && c.flagCountry) {
+    return 'https://flagcdn.com/w40/' + c.flagCountry + '.png';
+  }
+  return '';
 }
 
 function getSymbol(code) {
@@ -232,6 +242,7 @@ module.exports = {
   CURRENCIES,
   getCurrency,
   getSymbol,
+  getFlagUrl,
   formatAmount,
   convert,
   getAllRates,

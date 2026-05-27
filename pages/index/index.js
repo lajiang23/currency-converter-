@@ -6,7 +6,7 @@ const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
 Page({
   data: {
     amount: '100',
-    baseCurrency: api.getCurrency('CNY'),
+    baseCurrency: { ...api.getCurrency('CNY'), flagUrl: api.getFlagUrl('CNY') },
     baseSymbol: '¥',
     displayCurrencies: [],
     updateTime: '',
@@ -16,6 +16,9 @@ Page({
   },
 
   onLoad() {
+    this.setData({
+      currencies: api.CURRENCIES.map(c => ({ ...c, flagUrl: api.getFlagUrl(c.code) }))
+    });
     const rates = api.getLiveRates();
     this.buildList(rates);
     this.setData({ updateTime: '更新于 ' + api.getNow() });
@@ -50,6 +53,7 @@ Page({
       const decimals = converted >= 1000 ? 2 : (converted >= 1 ? 4 : 6);
       return {
         ...currency,
+        flagUrl: api.getFlagUrl(currency.code),
         formatted: converted.toFixed(decimals)
       };
     }).filter(Boolean);
@@ -80,7 +84,10 @@ Page({
     const code = e.currentTarget.dataset.code;
     const currency = api.getCurrency(code);
     if (currency) {
-      this.setData({ baseCurrency: currency, showPicker: false }, () => {
+      this.setData({
+        baseCurrency: { ...currency, flagUrl: api.getFlagUrl(code) },
+        showPicker: false
+      }, () => {
         this.buildList(api.getLiveRates());
       });
     }

@@ -44,9 +44,12 @@
   align-items: center;
   gap: 14rpx;
 }
-.base-flag {
-  font-size: 44rpx;
-  line-height: 1;
+.base-flag,
+.base-section .flag-fallback {
+  width: 48rpx;
+  height: 36rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
 }
 .base-info {
   display: flex;
@@ -103,9 +106,12 @@
   align-items: center;
   gap: 14rpx;
 }
-.conv-flag {
-  font-size: 40rpx;
-  line-height: 1;
+.conv-flag,
+.conv-item .flag-fallback {
+  width: 44rpx;
+  height: 33rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
 }
 .conv-info {
   display: flex;
@@ -231,8 +237,12 @@
 .picker-item:active {
   opacity: 0.6;
 }
-.pi-flag {
-  font-size: 40rpx;
+.pi-flag,
+.picker-item .flag-fallback {
+  width: 44rpx;
+  height: 33rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
 }
 .pi-info {
   flex: 1;

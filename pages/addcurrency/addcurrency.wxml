@@ -4,7 +4,8 @@
       wx:for="{{currencies}}" wx:key="code" data-code="{{item.code}}"
       bindtap="onToggle">
       <view class="li-left">
-        <text class="li-flag">{{item.flag}}</text>
+        <image wx:if="{{item.flagUrl}}" class="li-flag" src="{{item.flagUrl}}" mode="aspectFit" />
+        <view wx:else class="li-flag flag-fallback">{{item.code.charAt(0)}}</view>
         <view class="li-info">
           <text class="li-code">{{item.code}}</text>
           <text class="li-name">{{item.name}} {{item.symbol}}</text>

@@ -35,9 +35,12 @@
   align-items: center;
   gap: 16rpx;
 }
-.li-flag {
-  font-size: 40rpx;
-  line-height: 1;
+.li-flag,
+.list-item .flag-fallback {
+  width: 44rpx;
+  height: 33rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
 }
 .li-info {
   display: flex;

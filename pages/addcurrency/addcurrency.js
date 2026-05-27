@@ -12,6 +12,7 @@ Page({
     const selected = wx.getStorageSync(SELECTED_KEY) || DEFAULT_SELECTED;
     const list = api.CURRENCIES.filter(c => c.code !== 'CNY').map(c => ({
       ...c,
+      flagUrl: api.getFlagUrl(c.code),
       checked: selected.includes(c.code)
     }));
     this.setData({ currencies: list });
