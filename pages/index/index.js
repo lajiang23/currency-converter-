@@ -3,8 +3,6 @@ const i18n = require('../../utils/i18n');
 
 const SELECTED_KEY = 'selected_currencies';
 const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
-const AD_UNIT_ID = ''; // ← Set your WeChat Ad unit ID here
-
 // Generate deterministic-ish change for each currency
 function genChange(code) {
   const seed = code.charCodeAt(0) + code.charCodeAt(code.length - 1);
@@ -25,7 +23,6 @@ Page({
     refreshing: false,
     lang: i18n.getLang(),
     _: i18n.getAllStrings(),
-    adUnitId: AD_UNIT_ID
   },
 
   onLoad() {
@@ -167,11 +164,4 @@ Page({
     });
   },
 
-  // ===== Ad Events =====
-  onAdLoad() {
-    // Ad loaded successfully
-  },
-  onAdError(e) {
-    console.warn('[Ad] error', e.detail);
-  }
 });
