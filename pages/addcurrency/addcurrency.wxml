@@ -1,23 +1,29 @@
 <view class="page-add">
-  <scroll-view class="currency-list" scroll-y>
-    <view class="list-item {{item.checked ? 'checked' : ''}}"
-      wx:for="{{currencies}}" wx:key="code" data-code="{{item.code}}"
-      bindtap="onToggle">
-      <view class="li-left">
-        <image wx:if="{{item.flagUrl}}" class="li-flag" src="{{item.flagUrl}}" mode="aspectFit" />
-        <view wx:else class="li-flag flag-fallback">{{item.code.charAt(0)}}</view>
-        <view class="li-info">
-          <text class="li-code">{{item.code}}</text>
-          <text class="li-name">{{item.name}} {{item.symbol}}</text>
+  <view class="page-add-inner">
+    <view class="select-all-bar">
+      <text class="select-all-text">选择你要关注的货币</text>
+      <text class="select-all-count">已选 {{checkedCount}} 项</text>
+    </view>
+    <scroll-view class="currency-list" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="list-item {{item.checked ? 'checked' : ''}}"
+        wx:for="{{currencies}}" wx:key="code" data-code="{{item.code}}"
+        bindtap="onToggle">
+        <view class="li-left">
+          <image wx:if="{{item.flagUrl}}" class="li-flag" src="{{item.flagUrl}}" mode="aspectFit" />
+          <view wx:else class="li-flag flag-fallback">{{item.code.charAt(0)}}</view>
+          <view class="li-info">
+            <text class="li-code">{{item.code}}</text>
+            <text class="li-name">{{item.name}} · {{item.symbol}}</text>
+          </view>
+        </view>
+        <view class="li-checkbox {{item.checked ? 'on' : ''}}">
+          <text wx:if="{{item.checked}}">✓</text>
         </view>
       </view>
-      <view class="li-checkbox {{item.checked ? 'on' : ''}}">
-        <text wx:if="{{item.checked}}">✓</text>
-      </view>
-    </view>
-  </scroll-view>
+    </scroll-view>
+  </view>
 
   <view class="bottom-bar">
-    <button class="confirm-btn" bindtap="onConfirm">确定</button>
+    <button class="confirm-btn" bindtap="onConfirm">确定 ({{checkedCount}})</button>
   </view>
 </view>

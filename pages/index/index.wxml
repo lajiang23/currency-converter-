@@ -2,8 +2,13 @@
   <!-- ===== Base Currency Section ===== -->
   <view class="base-section">
     <view class="base-top">
-      <text class="base-label">基准货币</text>
-      <view class="base-change" bindtap="onChangeBase">更换</view>
+      <view class="base-top-left">
+        <text class="base-label">基准货币</text>
+      </view>
+      <view class="base-change" bindtap="onChangeBase">
+        <text>更换</text>
+        <text class="base-change-icon">›</text>
+      </view>
     </view>
     <view class="base-main">
       <view class="base-left">
@@ -11,10 +16,11 @@
         <view wx:else class="base-flag flag-fallback">{{baseCurrency.code.charAt(0)}}</view>
         <view class="base-info">
           <text class="base-code">{{baseCurrency.code}}</text>
-          <text class="base-name">{{baseCurrency.name}} {{baseSymbol}}</text>
+          <text class="base-name">{{baseCurrency.name}}</text>
         </view>
       </view>
       <view class="base-input-wrap">
+        <text class="base-input-sym">{{baseSymbol}}</text>
         <input class="base-input" type="digit" value="{{amount}}"
           bindinput="onAmountInput" placeholder="0" />
       </view>
@@ -22,28 +28,54 @@
   </view>
 
   <!-- ===== Conversion List ===== -->
-  <scroll-view class="conversion-list" scroll-y>
+  <scroll-view class="conversion-list" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="list-header">
+      <text class="list-header-title">货币换算</text>
+      <text class="list-header-count">{{displayCurrencies.length}} 种货币</text>
+    </view>
+
     <view class="conv-item" wx:for="{{displayCurrencies}}" wx:key="code">
       <view class="conv-left">
         <image wx:if="{{item.flagUrl}}" class="conv-flag" src="{{item.flagUrl}}" mode="aspectFit" />
         <view wx:else class="conv-flag flag-fallback">{{item.code.charAt(0)}}</view>
         <view class="conv-info">
-          <text class="conv-code">{{item.code}}</text>
+          <view class="conv-info-top">
+            <text class="conv-code">{{item.code}}</text>
+            <text class="conv-rate">1 {{item.code}} = {{item.rate}}</text>
+          </view>
           <text class="conv-name">{{item.name}} {{item.symbol}}</text>
         </view>
       </view>
-      <text class="conv-amount">{{item.formatted}}</text>
+      <view class="conv-right">
+        <text class="conv-amount">{{item.formatted}}</text>
+        <view class="conv-change {{item.changeUp ? 'up' : 'down'}}">
+          <text class="change-arrow">{{item.changeUp ? '▲' : '▼'}}</text>
+          <text class="change-pct">{{item.changePct}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty-state" wx:if="{{displayCurrencies.length === 0}}">
+      <text class="empty-icon">💱</text>
+      <text class="empty-text">还没有添加货币</text>
+      <text class="empty-sub">点击下方按钮添加关注的币种</text>
     </view>
 
     <!-- Add currency button -->
-    <view class="add-btn" bindtap="onAddCurrency">
-      <text class="add-icon">+</text>
-      <text class="add-text">添加货币</text>
+    <view class="add-btn-wrap">
+      <view class="add-btn" bindtap="onAddCurrency">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加货币</text>
+      </view>
     </view>
   </scroll-view>
 
   <!-- ===== Update Time ===== -->
-  <view class="update-bar">{{updateTime}}</view>
+  <view class="update-bar">
+    <text class="update-dot"></text>
+    <text>{{updateTime}}</text>
+  </view>
 
   <!-- ===== Currency Picker Bottom Sheet ===== -->
   <view class="modal-mask" wx:if="{{showPicker}}" bindtap="onPickerClose"></view>
@@ -52,14 +84,22 @@
       <text class="picker-title">选择基准货币</text>
       <view class="picker-close" bindtap="onPickerClose">✕</view>
     </view>
+    <view class="picker-current" wx:if="{{baseCurrency}}">
+      <text class="pc-label">当前基准</text>
+      <image wx:if="{{baseCurrency.flagUrl}}" class="pc-flag" src="{{baseCurrency.flagUrl}}" mode="aspectFit" />
+      <view wx:else class="pc-flag flag-fallback">{{baseCurrency.code.charAt(0)}}</view>
+      <text class="pc-code">{{baseCurrency.code}}</text>
+      <text class="pc-name">{{baseCurrency.name}}</text>
+    </view>
     <scroll-view class="picker-list" scroll-y>
-      <view class="picker-item" wx:for="{{currencies}}" wx:key="code"
+      <view class="picker-item {{item.code === baseCurrency.code ? 'active' : ''}}"
+        wx:for="{{currencies}}" wx:key="code"
         data-code="{{item.code}}" bindtap="onPickerSelect">
         <image wx:if="{{item.flagUrl}}" class="pi-flag" src="{{item.flagUrl}}" mode="aspectFit" />
         <view wx:else class="pi-flag flag-fallback">{{item.code.charAt(0)}}</view>
         <view class="pi-info">
           <text class="pi-code">{{item.code}}</text>
-          <text class="pi-name">{{item.name}} · {{item.symbol}}</text>
+          <text class="pi-name">{{item.name}}</text>
         </view>
         <text class="pi-check" wx:if="{{item.code === baseCurrency.code}}">✓</text>
       </view>

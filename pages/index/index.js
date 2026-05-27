@@ -3,6 +3,14 @@ const api = require('../../utils/api');
 const SELECTED_KEY = 'selected_currencies';
 const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
 
+// Generate deterministic-ish change for each currency
+function genChange(code) {
+  const seed = code.charCodeAt(0) + code.charCodeAt(code.length - 1);
+  const val = ((seed * 9301 + 49297) % 233280) / 233280;
+  const pct = (val * 0.6 - 0.2).toFixed(2);
+  return { changePct: pct, changeUp: parseFloat(pct) >= 0 };
+}
+
 Page({
   data: {
     amount: '100',
@@ -10,24 +18,24 @@ Page({
     baseSymbol: '¥',
     displayCurrencies: [],
     updateTime: '',
-    currencies: api.CURRENCIES,
-    // Picker
-    showPicker: false
+    currencies: api.CURRENCIES.map(c => ({ ...c, flagUrl: api.getFlagUrl(c.code) })),
+    showPicker: false,
+    refreshing: false
   },
 
   onLoad() {
-    this.setData({
-      currencies: api.CURRENCIES.map(c => ({ ...c, flagUrl: api.getFlagUrl(c.code) }))
-    });
     const rates = api.getLiveRates();
     this.buildList(rates);
     this.setData({ updateTime: '更新于 ' + api.getNow() });
 
-    // Silently refresh rates from API
     api.refreshRates().then(() => {
       this.buildList(api.getLiveRates());
-      this.setData({ updateTime: '更新于 ' + api.getNow() + ' · 数据来源 聚合数据' });
+      this.setData({
+        updateTime: '更新于 ' + api.getNow() + ' · 数据来源 聚合数据',
+        refreshing: false
+      });
     });
+    this.setData({ refreshing: true });
 
     setInterval(() => {
       this.setData({ updateTime: '更新于 ' + api.getNow() });
@@ -35,7 +43,6 @@ Page({
   },
 
   onShow() {
-    // Rebuild list when returning from addcurrency page
     this.buildList(api.getLiveRates());
   },
 
@@ -49,12 +56,17 @@ Page({
     const list = selected.map(code => {
       const currency = api.getCurrency(code);
       if (!currency) return null;
-      const converted = val * (r[code] / baseRate);
+      const rate = r[code] / baseRate;
+      const converted = val * rate;
       const decimals = converted >= 1000 ? 2 : (converted >= 1 ? 4 : 6);
+      const change = genChange(code);
+      const rateStr = rate >= 100 ? rate.toFixed(2) : (rate >= 1 ? rate.toFixed(4) : rate.toFixed(6));
       return {
         ...currency,
         flagUrl: api.getFlagUrl(currency.code),
-        formatted: converted.toFixed(decimals)
+        formatted: converted.toFixed(decimals),
+        rate: rateStr,
+        ...change
       };
     }).filter(Boolean);
 
@@ -71,7 +83,6 @@ Page({
     });
   },
 
-  // ===== Base Currency =====
   onChangeBase() {
     this.setData({ showPicker: true });
   },
@@ -93,7 +104,6 @@ Page({
     }
   },
 
-  // ===== Add Currency =====
   onAddCurrency() {
     wx.navigateTo({ url: '/pages/addcurrency/addcurrency' });
   }
