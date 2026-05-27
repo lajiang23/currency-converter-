@@ -1,0 +1,88 @@
+<view class="page-chart">
+  <!-- ===== Chart Card ===== -->
+  <view class="chart-card">
+    <view class="chart-header">
+      <view class="chart-pair">
+        <text class="cp-flags">🇨🇳🇺🇸</text>
+        <text class="cp-name">{{baseCode}} / {{targetCode}}</text>
+      </view>
+      <view class="chart-periods">
+        <view class="cp-btn {{period === '1D' ? 'active' : ''}}" data-period="1D" bindtap="onPeriodChange">1天</view>
+        <view class="cp-btn {{period === '1W' ? 'active' : ''}}" data-period="1W" bindtap="onPeriodChange">1周</view>
+        <view class="cp-btn {{period === '1M' ? 'active' : ''}}" data-period="1M" bindtap="onPeriodChange">1月</view>
+        <view class="cp-btn {{period === '1Y' ? 'active' : ''}}" data-period="1Y" bindtap="onPeriodChange">1年</view>
+      </view>
+    </view>
+
+    <view class="chart-current-price">
+      <text class="cc-price">{{currentPrice}}</text>
+      <text class="cc-change {{changeUp ? 'up' : 'down'}}">
+        {{changeUp ? '▲' : '▼'}} {{changePct}}%
+      </text>
+    </view>
+
+    <canvas class="chart-canvas" canvas-id="chartCanvas" type="2d"></canvas>
+
+    <view class="chart-stats">
+      <view class="cs-item">
+        <text class="cs-label">最高</text>
+        <text class="cs-value" style="color:#059669;">{{highPrice}}</text>
+      </view>
+      <view class="cs-item">
+        <text class="cs-label">最低</text>
+        <text class="cs-value" style="color:var(--red);">{{lowPrice}}</text>
+      </view>
+      <view class="cs-item">
+        <text class="cs-label">开盘</text>
+        <text class="cs-value">{{openPrice}}</text>
+      </view>
+      <view class="cs-item">
+        <text class="cs-label">涨跌</text>
+        <text class="cs-value {{changeUp ? 'up' : 'down'}}">{{changeUp ? '+' : ''}}{{changePct}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Technical Indicators ===== -->
+  <view class="card">
+    <view class="card-title">📊 技术指标</view>
+    <view class="tech-grid">
+      <view class="tech-item">
+        <text class="tech-label">MA5</text>
+        <text class="tech-value">{{ma5}}</text>
+      </view>
+      <view class="tech-item">
+        <text class="tech-label">MA20</text>
+        <text class="tech-value">{{ma20}}</text>
+      </view>
+      <view class="tech-item">
+        <text class="tech-label">RSI(14)</text>
+        <text class="tech-value" style="color:{{rsi > 70 ? 'var(--red)' : rsi < 30 ? '#059669' : ''}}">{{rsi}}</text>
+      </view>
+      <view class="tech-item">
+        <text class="tech-label">波动率</text>
+        <text class="tech-value">{{volatility}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Tab Bar ===== -->
+  <view class="tab-bar">
+    <view class="tab-item" data-tab="index" bindtap="onTabTap">
+      <text class="tab-icon">🏠</text>
+      <text class="tab-label">首页</text>
+    </view>
+    <view class="tab-item" data-tab="multicurrency" bindtap="onTabTap">
+      <text class="tab-icon">💱</text>
+      <text class="tab-label">多币种</text>
+    </view>
+    <view class="tab-item active" data-tab="chart" bindtap="onTabTap">
+      <text class="tab-icon">📈</text>
+      <text class="tab-label">走势</text>
+    </view>
+    <view class="tab-item" data-tab="profile" bindtap="onTabTap">
+      <text class="tab-icon">👤</text>
+      <text class="tab-label">我的</text>
+    </view>
+  </view>
+</view>

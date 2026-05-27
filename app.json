@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/multicurrency/multicurrency",
+    "pages/chart/chart",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "汇率换算",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F2F4F7",
+    "backgroundColorTop": "#F2F4F7",
+    "backgroundColorBottom": "#F2F4F7"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

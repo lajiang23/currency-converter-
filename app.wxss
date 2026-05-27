@@ -1,0 +1,84 @@
+/* ===== Global Variables ===== */
+page {
+  --primary: #1A73E8;
+  --primary-light: #E8F0FE;
+  --green: #34D399;
+  --green-bg: #ECFDF5;
+  --red: #EF4444;
+  --red-bg: #FEF2F2;
+  --bg: #F2F4F7;
+  --card: #FFFFFF;
+  --text: #1A1A2E;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --border: #E5E7EB;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 24rpx;
+  --radius-sm: 16rpx;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-size: 28rpx;
+  color: var(--text);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+/* ===== Reset ===== */
+view, text, image, button, input {
+  box-sizing: border-box;
+}
+
+button {
+  padding: 0;
+  margin: 0;
+  background: none;
+  line-height: inherit;
+  font-size: inherit;
+}
+button::after {
+  border: none;
+}
+
+/* ===== Utility Classes ===== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24rpx;
+  margin: 0 20rpx 16rpx;
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: 40rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+.pill-green {
+  background: var(--green-bg);
+  color: #059669;
+}
+.pill-red {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

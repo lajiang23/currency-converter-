@@ -1,0 +1,60 @@
+<view class="page-multi">
+  <!-- ===== Header Amount ===== -->
+  <view class="multi-header">
+    <view class="mh-label">基准金额 (<text class="mh-base">{{baseCurrency.code}}</text>)</view>
+    <view class="mh-input-row">
+      <text class="mh-symbol">{{baseSymbol}}</text>
+      <input class="mh-input" type="digit" value="{{baseAmount}}" bindinput="onBaseAmountChange" />
+    </view>
+  </view>
+
+  <!-- ===== Search ===== -->
+  <view class="search-box">
+    <text class="search-icon">🔍</text>
+    <input class="search-input" placeholder="搜索货币名称或代码..." bindinput="onSearch" />
+  </view>
+
+  <!-- ===== Currency List ===== -->
+  <scroll-view class="multi-list" scroll-y>
+    <view class="multi-item" wx:for="{{displayList}}" wx:key="code"
+      wx:for-item="item">
+      <text class="mi-flag">{{item.flag}}</text>
+      <view class="mi-info">
+        <text class="mi-code">{{item.code}}</text>
+        <text class="mi-name">{{item.name}}</text>
+      </view>
+      <view class="mi-right">
+        <text class="mi-amount">{{item.formatted}}</text>
+        <view class="mi-change {{item.changeUp ? 'up' : 'down'}}">
+          <text>{{item.changeUp ? '▲' : '▼'}} {{item.changePct}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty-state" wx:if="{{displayList.length === 0}}">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">未找到匹配的货币</text>
+    </view>
+  </scroll-view>
+
+  <!-- ===== Tab Bar ===== -->
+  <view class="tab-bar">
+    <view class="tab-item" data-tab="index" bindtap="onTabTap">
+      <text class="tab-icon">🏠</text>
+      <text class="tab-label">首页</text>
+    </view>
+    <view class="tab-item active" data-tab="multicurrency" bindtap="onTabTap">
+      <text class="tab-icon">💱</text>
+      <text class="tab-label">多币种</text>
+    </view>
+    <view class="tab-item" data-tab="chart" bindtap="onTabTap">
+      <text class="tab-icon">📈</text>
+      <text class="tab-label">走势</text>
+    </view>
+    <view class="tab-item" data-tab="profile" bindtap="onTabTap">
+      <text class="tab-icon">👤</text>
+      <text class="tab-label">我的</text>
+    </view>
+  </view>
+</view>

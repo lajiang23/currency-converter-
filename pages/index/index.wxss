@@ -1,0 +1,343 @@
+/* ===== Converter Card ===== */
+.converter-card {
+  margin: 20rpx 20rpx 16rpx;
+  background: linear-gradient(135deg, #1A73E8 0%, #1557B0 100%);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.converter-card::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 400rpx;
+  height: 400rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.converter-card::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  width: 300rpx;
+  height: 300rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+}
+
+/* Currency selectors */
+.currency-selectors {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 24rpx;
+}
+
+.selector {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 14rpx 22rpx;
+  border-radius: 16rpx;
+  min-width: 160rpx;
+  border: 1rpx solid rgba(255,255,255,0.1);
+}
+.selector:active {
+  background: rgba(255,255,255,0.25);
+}
+.selector .flag {
+  font-size: 36rpx;
+  line-height: 1;
+}
+.selector .code {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.selector .arrow {
+  font-size: 18rpx;
+  opacity: 0.7;
+  margin-left: 8rpx;
+}
+
+.swap-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+.swap-btn:active {
+  transform: rotate(180deg);
+}
+
+/* Amount area */
+.amount-area {
+  position: relative;
+  z-index: 1;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+.input-row .symbol {
+  font-size: 40rpx;
+  font-weight: 300;
+  opacity: 0.8;
+}
+.amount-input {
+  font-size: 72rpx;
+  font-weight: 700;
+  letter-spacing: -2rpx;
+  color: #fff;
+  text-align: center;
+  width: 320rpx;
+  height: 80rpx;
+  padding: 0;
+  background: transparent;
+}
+.amount-input::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+.result-row {
+  text-align: center;
+  margin-top: 8rpx;
+}
+.result-symbol {
+  font-size: 32rpx;
+  font-weight: 500;
+  opacity: 0.9;
+}
+.result-amount {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.rate-row {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  opacity: 0.75;
+}
+.rate-row .up {
+  color: #6EE7B7;
+}
+.rate-row .down {
+  color: #FCA5A5;
+}
+
+/* ===== Quick Pairs ===== */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+}
+.quick-item {
+  text-align: center;
+  padding: 14rpx 6rpx;
+  border-radius: 14rpx;
+  background: var(--bg);
+  border: 1rpx solid transparent;
+}
+.quick-item:active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.quick-item .qf {
+  font-size: 36rpx;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.quick-item .qc {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+}
+.quick-item .qr {
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2rpx;
+}
+
+/* ===== Recent ===== */
+.recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+.recent-item:last-child {
+  border-bottom: none;
+}
+.recent-left {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+.recent-right {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ===== Update bar ===== */
+.update-bar {
+  text-align: center;
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  padding: 16rpx 0 20rpx;
+}
+
+/* ===== Tab Bar ===== */
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-top: 1rpx solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 100rpx;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  color: var(--text-tertiary);
+  font-size: 20rpx;
+}
+.tab-item.active {
+  color: var(--primary);
+}
+.tab-icon {
+  font-size: 40rpx;
+  line-height: 1.2;
+}
+.tab-label {
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+/* ===== Currency Picker Modal ===== */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+}
+.picker-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  z-index: 201;
+  padding: 20rpx 0 env(safe-area-inset-bottom, 30rpx);
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+}
+.picker-sheet.show {
+  transform: translateY(0);
+}
+.picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28rpx 16rpx;
+}
+.picker-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.picker-close {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+.picker-search {
+  margin: 0 28rpx 16rpx;
+  padding: 16rpx 24rpx;
+  background: var(--bg);
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  border: 1rpx solid var(--border);
+}
+.picker-search:focus {
+  border-color: var(--primary);
+}
+.picker-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 28rpx;
+}
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+.picker-item:last-child {
+  border-bottom: none;
+}
+.picker-item:active {
+  opacity: 0.6;
+}
+.pi-flag {
+  font-size: 40rpx;
+}
+.pi-info {
+  flex: 1;
+}
+.pi-code {
+  font-size: 28rpx;
+  font-weight: 600;
+  display: block;
+}
+.pi-name {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2rpx;
+}
+.pi-check {
+  color: var(--primary);
+  font-size: 28rpx;
+  font-weight: 700;
+}
