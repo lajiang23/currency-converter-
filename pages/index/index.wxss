@@ -343,6 +343,27 @@
 .ad-wrap {
   padding: 16rpx 16rpx 4rpx;
 }
+.ad-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120rpx;
+  background: var(--bg);
+  border-radius: 16rpx;
+  border: 2rpx dashed var(--border);
+}
+.ad-ph-text {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+.ad-ph-sub {
+  font-size: 18rpx;
+  color: var(--text-tertiary);
+  margin-top: 4rpx;
+  opacity: 0.6;
+}
 
 /* ===== Update Time ===== */
 .update-bar {

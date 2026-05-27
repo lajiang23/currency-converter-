@@ -75,8 +75,12 @@
     </view>
 
     <!-- ===== WeChat Banner Ad ===== -->
-    <view class="ad-wrap" wx:if="{{adUnitId}}">
-      <ad unit-id="{{adUnitId}}" ad-intervals="{{60}}" bindload="onAdLoad" binderror="onAdError"></ad>
+    <view class="ad-wrap">
+      <ad wx:if="{{adUnitId}}" unit-id="{{adUnitId}}" ad-intervals="{{60}}" bindload="onAdLoad" binderror="onAdError"></ad>
+      <view wx:else class="ad-placeholder">
+        <text class="ad-ph-text">{{lang === 'en' ? 'Ad Space' : '广告位'}}</text>
+        <text class="ad-ph-sub">WeChat Banner Ad — {{lang === 'en' ? 'Set AD_UNIT_ID in index.js' : '在 index.js 中配置 AD_UNIT_ID'}}</text>
+      </view>
     </view>
   </scroll-view>
 
