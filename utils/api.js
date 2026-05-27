@@ -128,7 +128,7 @@ async function refreshRates() {
   for (const code of KEY_CURRENCIES) {
     try {
       const res = await wx.request({
-        url: 'http://op.juhe.cn/onebox/exchange/currency',
+        url: 'https://op.juhe.cn/onebox/exchange/currency',
         data: { key: JUHE_KEY, from: 'CNY', to: code, version: 2 },
         timeout: 5000
       });
