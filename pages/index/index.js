@@ -1,209 +1,93 @@
 const api = require('../../utils/api');
-const util = require('../../utils/util');
+
+const SELECTED_KEY = 'selected_currencies';
+const DEFAULT_SELECTED = ['USD', 'JPY', 'EUR', 'HKD'];
 
 Page({
   data: {
-    // Converter
-    amount: '1000',
-    fromCurrency: api.getCurrency('CNY'),
-    toCurrency: api.getCurrency('USD'),
-    fromSymbol: '¥',
-    toSymbol: '$',
-    result: '',
-    rate: '',
-    changePercent: '+0.02',
-    changeUp: true,
-
-    // Quick pairs
-    quickPairs: [],
+    amount: '100',
+    baseCurrency: api.getCurrency('CNY'),
+    baseSymbol: '¥',
+    displayCurrencies: [],
     updateTime: '',
-
-    // Recent
-    recentList: [],
-
+    currencies: api.CURRENCIES,
     // Picker
-    showPicker: false,
-    pickerMode: 'from',
-    searchQuery: '',
-    filteredCurrencies: []
+    showPicker: false
   },
 
   onLoad() {
     const rates = api.getLiveRates();
-    this.buildQuickPairs(rates);
-    this.doConvert();
-    this.updateTimeDisplay();
-    this.loadRecent();
+    this.buildList(rates);
+    this.setData({ updateTime: '更新于 ' + api.getNow() });
 
-    // Silently refresh rates from API in background
+    // Silently refresh rates from API
     api.refreshRates().then(() => {
-      const fresh = api.getLiveRates();
-      this.buildQuickPairs(fresh);
-      this.doConvert();
+      this.buildList(api.getLiveRates());
       this.setData({ updateTime: '更新于 ' + api.getNow() + ' · 数据来源 聚合数据' });
     });
+
+    setInterval(() => {
+      this.setData({ updateTime: '更新于 ' + api.getNow() });
+    }, 30000);
   },
 
   onShow() {
-    // Refresh rates when page is shown
-    const rates = api.getLiveRates();
-    this.buildQuickPairs(rates);
-    this.doConvert();
+    // Rebuild list when returning from addcurrency page
+    this.buildList(api.getLiveRates());
   },
 
-  // ===== Conversion =====
+  buildList(rates) {
+    const r = rates || api.getLiveRates();
+    const base = this.data.baseCurrency.code;
+    const selected = wx.getStorageSync(SELECTED_KEY) || DEFAULT_SELECTED;
+    const baseRate = r[base] || 1;
+    const val = parseFloat(this.data.amount) || 0;
+
+    const list = selected.map(code => {
+      const currency = api.getCurrency(code);
+      if (!currency) return null;
+      const converted = val * (r[code] / baseRate);
+      const decimals = converted >= 1000 ? 2 : (converted >= 1 ? 4 : 6);
+      return {
+        ...currency,
+        formatted: converted.toFixed(decimals)
+      };
+    }).filter(Boolean);
+
+    this.setData({
+      displayCurrencies: list,
+      baseSymbol: api.getSymbol(base)
+    });
+  },
+
   onAmountInput(e) {
     const val = e.detail.value.replace(/[^0-9.]/g, '');
-    this.setData({ amount: val }, () => this.doConvert());
-  },
-
-  doConvert() {
-    const { amount, fromCurrency, toCurrency } = this.data;
-    const val = parseFloat(amount) || 0;
-    if (val <= 0) {
-      this.setData({ result: '', rate: '' });
-      return;
-    }
-    const converted = api.convert(val, fromCurrency.code, toCurrency.code);
-    const sym = api.getSymbol(toCurrency.code);
-    const decimals = converted >= 1000 ? 2 : (converted >= 1 ? 4 : 6);
-    this.setData({
-      result: converted.toFixed(decimals),
-      toSymbol: sym,
-      fromSymbol: api.getSymbol(fromCurrency.code),
-      rate: (api.getLiveRates()[toCurrency.code] / api.getLiveRates()[fromCurrency.code]).toFixed(6),
-      changePercent: (Math.random() * 0.4).toFixed(2),
-      changeUp: Math.random() > 0.45
+    this.setData({ amount: val || '0' }, () => {
+      this.buildList(api.getLiveRates());
     });
   },
 
-  // ===== Currency Selection =====
-  onSelectFrom() {
-    this.openPicker('from');
-  },
-
-  onSelectTo() {
-    this.openPicker('to');
-  },
-
-  openPicker(mode) {
-    this.setData({
-      showPicker: true,
-      pickerMode: mode,
-      searchQuery: '',
-      filteredCurrencies: api.CURRENCIES
-    });
+  // ===== Base Currency =====
+  onChangeBase() {
+    this.setData({ showPicker: true });
   },
 
   onPickerClose() {
     this.setData({ showPicker: false });
   },
 
-  onSearchInput(e) {
-    const q = e.detail.value.toUpperCase();
-    const list = api.CURRENCIES.filter(c =>
-      c.code.includes(q) || c.name.includes(q) || c.full.toUpperCase().includes(q)
-    );
-    this.setData({ searchQuery: e.detail.value, filteredCurrencies: q ? list : api.CURRENCIES });
-  },
-
   onPickerSelect(e) {
     const code = e.currentTarget.dataset.code;
     const currency = api.getCurrency(code);
-    if (!currency) return;
-
-    if (this.data.pickerMode === 'from') {
-      this.setData({ fromCurrency: currency }, () => this.doConvert());
-    } else {
-      this.setData({ toCurrency: currency }, () => this.doConvert());
-    }
-    this.setData({ showPicker: false });
-  },
-
-  // ===== Swap =====
-  onSwap() {
-    const { fromCurrency, toCurrency } = this.data;
-    this.setData({
-      fromCurrency: toCurrency,
-      toCurrency: fromCurrency
-    }, () => this.doConvert());
-  },
-
-  // ===== Quick Pairs =====
-  buildQuickPairs(rates) {
-    const r = rates || api.getLiveRates();
-    const pairs = [
-      { from: 'CNY', to: 'USD', flag: '\u{1F1FA}\u{1F1F8}', code: 'USD' },
-      { from: 'CNY', to: 'EUR', flag: '\u{1F1EA}\u{1F1FA}', code: 'EUR' },
-      { from: 'CNY', to: 'HKD', flag: '\u{1F1ED}\u{1F1F0}', code: 'HKD' },
-      { from: 'CNY', to: 'JPY', flag: '\u{1F1EF}\u{1F1F5}', code: 'JPY' },
-      { from: 'CNY', to: 'GBP', flag: '\u{1F1EC}\u{1F1E7}', code: 'GBP' },
-      { from: 'CNY', to: 'KRW', flag: '\u{1F1F0}\u{1F1F7}', code: 'KRW' },
-      { from: 'CNY', to: 'AUD', flag: '\u{1F1E6}\u{1F1FA}', code: 'AUD' },
-      { from: 'CNY', to: 'THB', flag: '\u{1F1F9}\u{1F1ED}', code: 'THB' }
-    ];
-    const list = pairs.map(p => {
-      const rate = (r[p.to] / r[p.from]).toFixed(4);
-      return { ...p, rate };
-    });
-    this.setData({ quickPairs: list });
-  },
-
-  onQuickPair(e) {
-    const { from, to } = e.currentTarget.dataset;
-    const fromC = api.getCurrency(from);
-    const toC = api.getCurrency(to);
-    if (fromC && toC) {
-      this.setData({ fromCurrency: fromC, toCurrency: toC }, () => this.doConvert());
+    if (currency) {
+      this.setData({ baseCurrency: currency, showPicker: false }, () => {
+        this.buildList(api.getLiveRates());
+      });
     }
   },
 
-  // ===== Recent =====
-  loadRecent() {
-    const list = wx.getStorageSync('recent_conversions') || [];
-    this.setData({ recentList: list.slice(0, 5) });
-  },
-
-  saveRecent(from, to, result) {
-    let list = wx.getStorageSync('recent_conversions') || [];
-    const entry = { from, to, result, time: Date.now() };
-    list = list.filter(item => !(item.from === from && item.to === to));
-    list.unshift(entry);
-    wx.setStorageSync('recent_conversions', list.slice(0, 20));
-    this.loadRecent();
-  },
-
-  onRecentTap(e) {
-    const idx = e.currentTarget.dataset.index;
-    const item = this.data.recentList[idx];
-    if (item) {
-      const fromC = api.getCurrency(item.from);
-      const toC = api.getCurrency(item.to);
-      if (fromC && toC) {
-        this.setData({ fromCurrency: fromC, toCurrency: toC }, () => this.doConvert());
-      }
-    }
-  },
-
-  // ===== Time =====
-  updateTimeDisplay() {
-    this.setData({ updateTime: '更新于 ' + api.getNow() });
-    setInterval(() => {
-      this.setData({ updateTime: '更新于 ' + api.getNow() });
-    }, 30000);
-  },
-
-  // ===== Tab Navigation =====
-  onTabTap(e) {
-    const tab = e.currentTarget.dataset.tab;
-    const pages = {
-      index: '',
-      multicurrency: '/pages/multicurrency/multicurrency',
-      chart: '/pages/chart/chart',
-      profile: '/pages/profile/profile'
-    };
-    if (pages[tab]) {
-      wx.reLaunch({ url: pages[tab] });
-    }
+  // ===== Add Currency =====
+  onAddCurrency() {
+    wx.navigateTo({ url: '/pages/addcurrency/addcurrency' });
   }
 });

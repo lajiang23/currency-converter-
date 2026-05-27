@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/addcurrency/addcurrency",
     "pages/multicurrency/multicurrency",
     "pages/chart/chart",
     "pages/profile/profile"

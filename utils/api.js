@@ -17,7 +17,7 @@ const CURRENCIES = [
   { code: 'JPY', name: '日元', full: 'Japanese Yen', flag: '\u{1F1EF}\u{1F1F5}', symbol: '¥' },
   { code: 'KRW', name: '韩元', full: 'South Korean Won', flag: '\u{1F1F0}\u{1F1F7}', symbol: '₩' },
   { code: 'HKD', name: '港币', full: 'Hong Kong Dollar', flag: '\u{1F1ED}\u{1F1F0}', symbol: 'HK$' },
-  { code: 'TWD', name: '新台币', full: 'Taiwan Dollar', flag: '\u{1F1F9}\u{1F1FC}', symbol: 'NT$' },
+  { code: 'TWD', name: '新台币', full: 'Taiwan Dollar', flag: '\u{1F310}', symbol: 'NT$' },
   { code: 'SGD', name: '新加坡元', full: 'Singapore Dollar', flag: '\u{1F1F8}\u{1F1EC}', symbol: 'S$' },
   { code: 'AUD', name: '澳元', full: 'Australian Dollar', flag: '\u{1F1E6}\u{1F1FA}', symbol: 'A$' },
   { code: 'CAD', name: '加元', full: 'Canadian Dollar', flag: '\u{1F1E8}\u{1F1E6}', symbol: 'C$' },

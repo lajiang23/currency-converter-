@@ -1,0 +1,22 @@
+<view class="page-add">
+  <scroll-view class="currency-list" scroll-y>
+    <view class="list-item {{item.checked ? 'checked' : ''}}"
+      wx:for="{{currencies}}" wx:key="code" data-code="{{item.code}}"
+      bindtap="onToggle">
+      <view class="li-left">
+        <text class="li-flag">{{item.flag}}</text>
+        <view class="li-info">
+          <text class="li-code">{{item.code}}</text>
+          <text class="li-name">{{item.name}} {{item.symbol}}</text>
+        </view>
+      </view>
+      <view class="li-checkbox {{item.checked ? 'on' : ''}}">
+        <text wx:if="{{item.checked}}">✓</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="confirm-btn" bindtap="onConfirm">确定</button>
+  </view>
+</view>

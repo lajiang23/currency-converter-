@@ -1,113 +1,65 @@
-<view class="page-converter">
-  <!-- ===== Converter Card ===== -->
-  <view class="converter-card">
-    <view class="currency-selectors">
-      <view class="selector" bindtap="onSelectFrom">
-        <text class="flag">{{fromCurrency.flag}}</text>
-        <text class="code">{{fromCurrency.code}}</text>
-        <text class="arrow">▼</text>
-      </view>
-      <view class="swap-btn" bindtap="onSwap">
-        <text>⇄</text>
-      </view>
-      <view class="selector" bindtap="onSelectTo">
-        <text class="flag">{{toCurrency.flag}}</text>
-        <text class="code">{{toCurrency.code}}</text>
-        <text class="arrow">▼</text>
-      </view>
+<view class="page-index">
+  <!-- ===== Base Currency Section ===== -->
+  <view class="base-section">
+    <view class="base-top">
+      <text class="base-label">基准货币</text>
+      <view class="base-change" bindtap="onChangeBase">更换</view>
     </view>
-
-    <view class="amount-area">
-      <view class="input-row">
-        <text class="symbol">{{fromSymbol}}</text>
-        <input class="amount-input" type="digit" value="{{amount}}" inputmode="decimal"
-          bindinput="onAmountInput" placeholder="0" focus="{{false}}" />
+    <view class="base-main">
+      <view class="base-left">
+        <text class="base-flag">{{baseCurrency.flag}}</text>
+        <view class="base-info">
+          <text class="base-code">{{baseCurrency.code}}</text>
+          <text class="base-name">{{baseCurrency.name}} {{baseSymbol}}</text>
+        </view>
       </view>
-      <view class="result-row" wx:if="{{amount > 0}}">
-        <text class="result-symbol">{{toSymbol}}</text>
-        <text class="result-amount">{{result}}</text>
-      </view>
-      <view class="rate-row" wx:if="{{amount > 0}}">
-        <text>1 {{fromCurrency.code}} = {{rate}} {{toCurrency.code}}</text>
-        <text class="{{changeUp ? 'up' : 'down'}}">
-          {{changeUp ? '▲' : '▼'}} {{changePercent}}%
-        </text>
+      <view class="base-input-wrap">
+        <input class="base-input" type="digit" value="{{amount}}"
+          bindinput="onAmountInput" placeholder="0" />
       </view>
     </view>
   </view>
 
-  <!-- ===== Quick Pairs ===== -->
-  <view class="card">
-    <view class="card-title">🔥 常用货币对</view>
-    <view class="quick-grid">
-      <view class="quick-item" wx:for="{{quickPairs}}" wx:key="code"
-        data-from="{{item.from}}" data-to="{{item.to}}"
-        bindtap="onQuickPair">
-        <text class="qf">{{item.flag}}</text>
-        <text class="qc">{{item.code}}</text>
-        <text class="qr">{{item.rate}}</text>
+  <!-- ===== Conversion List ===== -->
+  <scroll-view class="conversion-list" scroll-y>
+    <view class="conv-item" wx:for="{{displayCurrencies}}" wx:key="code">
+      <view class="conv-left">
+        <text class="conv-flag">{{item.flag}}</text>
+        <view class="conv-info">
+          <text class="conv-code">{{item.code}}</text>
+          <text class="conv-name">{{item.name}} {{item.symbol}}</text>
+        </view>
       </view>
+      <text class="conv-amount">{{item.formatted}}</text>
     </view>
-  </view>
 
-  <!-- ===== Recent Conversions (skeleton placeholder) ===== -->
-  <view class="card" wx:if="{{recentList.length > 0}}">
-    <view class="card-title">🕐 最近换算</view>
-    <view class="recent-item" wx:for="{{recentList}}" wx:key="index"
-      bindtap="onRecentTap" data-index="{{index}}">
-      <view class="recent-left">
-        <text>{{item.from}} → {{item.to}}</text>
-      </view>
-      <view class="recent-right">
-        <text class="recent-val">{{item.result}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- ===== Update Time ===== -->
-  <view class="update-bar">
-    <text>{{updateTime}}</text>
-  </view>
-
-  <!-- ===== Tab Bar ===== -->
-  <view class="tab-bar">
-    <view class="tab-item active" data-tab="index" bindtap="onTabTap">
-      <text class="tab-icon">🏠</text>
-      <text class="tab-label">首页</text>
-    </view>
-    <view class="tab-item" data-tab="multicurrency" bindtap="onTabTap">
-      <text class="tab-icon">💱</text>
-      <text class="tab-label">多币种</text>
-    </view>
-    <view class="tab-item" data-tab="chart" bindtap="onTabTap">
-      <text class="tab-icon">📈</text>
-      <text class="tab-label">走势</text>
-    </view>
-    <view class="tab-item" data-tab="profile" bindtap="onTabTap">
-      <text class="tab-icon">👤</text>
-      <text class="tab-label">我的</text>
-    </view>
-  </view>
-</view>
-
-<!-- ===== Currency Picker Bottom Sheet ===== -->
-<view class="modal-mask" wx:if="{{showPicker}}" bindtap="onPickerClose"></view>
-<view class="picker-sheet {{showPicker ? 'show' : ''}}">
-  <view class="picker-header">
-    <text class="picker-title">选择货币</text>
-    <view class="picker-close" bindtap="onPickerClose">✕</view>
-  </view>
-  <input class="picker-search" placeholder="搜索货币名称或代码" value="{{searchQuery}}"
-    bindinput="onSearchInput" />
-  <scroll-view class="picker-list" scroll-y>
-    <view class="picker-item" wx:for="{{filteredCurrencies}}" wx:key="code"
-      data-code="{{item.code}}" bindtap="onPickerSelect">
-      <text class="pi-flag">{{item.flag}}</text>
-      <view class="pi-info">
-        <text class="pi-code">{{item.code}}</text>
-        <text class="pi-name">{{item.name}} · {{item.full}}</text>
-      </view>
-      <text class="pi-check" wx:if="{{item.code === pickerMode === 'from' ? fromCurrency.code : toCurrency.code}}">✓</text>
+    <!-- Add currency button -->
+    <view class="add-btn" bindtap="onAddCurrency">
+      <text class="add-icon">+</text>
+      <text class="add-text">添加货币</text>
     </view>
   </scroll-view>
+
+  <!-- ===== Update Time ===== -->
+  <view class="update-bar">{{updateTime}}</view>
+
+  <!-- ===== Currency Picker Bottom Sheet ===== -->
+  <view class="modal-mask" wx:if="{{showPicker}}" bindtap="onPickerClose"></view>
+  <view class="picker-sheet {{showPicker ? 'show' : ''}}">
+    <view class="picker-header">
+      <text class="picker-title">选择基准货币</text>
+      <view class="picker-close" bindtap="onPickerClose">✕</view>
+    </view>
+    <scroll-view class="picker-list" scroll-y>
+      <view class="picker-item" wx:for="{{currencies}}" wx:key="code"
+        data-code="{{item.code}}" bindtap="onPickerSelect">
+        <text class="pi-flag">{{item.flag}}</text>
+        <view class="pi-info">
+          <text class="pi-code">{{item.code}}</text>
+          <text class="pi-name">{{item.name}} · {{item.symbol}}</text>
+        </view>
+        <text class="pi-check" wx:if="{{item.code === baseCurrency.code}}">✓</text>
+      </view>
+    </scroll-view>
+  </view>
 </view>
