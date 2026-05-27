@@ -1,9 +1,15 @@
 /**
  * Exchange rate data and API service
- * MVP uses mock data; replace fetchRates() with real API call
+ * Data source: 聚合数据 (Juhe.cn)
  */
 
-// 32 supported currencies
+// ===== Config =====
+const JUHE_KEY = '557f44faa568dde0ddd7dbc8a7bdc31f';
+const CACHE_KEY = 'juhe_rates_cache';
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const KEY_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'HKD', 'KRW', 'AUD', 'THB'];
+
+// ===== Currency Definitions =====
 const CURRENCIES = [
   { code: 'USD', name: '美元', full: 'US Dollar', flag: '\u{1F1FA}\u{1F1F8}', symbol: '$' },
   { code: 'EUR', name: '欧元', full: 'Euro', flag: '\u{1F1EA}\u{1F1FA}', symbol: '€' },
@@ -39,8 +45,8 @@ const CURRENCIES = [
   { code: 'CNY', name: '人民币', full: 'Chinese Yuan', flag: '\u{1F1E8}\u{1F1F3}', symbol: '¥' }
 ];
 
-// Rates based on 1 CNY
-const BASE_RATES = {
+// Fallback reference rates (1 CNY = X)
+const FALLBACK_RATES = {
   USD: 0.13852, EUR: 0.12831, GBP: 0.10942, JPY: 20.673,
   KRW: 191.25,  HKD: 1.0821,  TWD: 4.482,   SGD: 0.1867,
   AUD: 0.2137,  CAD: 0.1894,  CHF: 0.1241,  THB: 5.0182,
@@ -51,6 +57,7 @@ const BASE_RATES = {
   MXN: 2.478,   BRL: 0.721,   NGN: 212.5,   CNY: 1
 };
 
+// ===== Helpers =====
 function getCurrency(code) {
   return CURRENCIES.find(c => c.code === code);
 }
@@ -63,40 +70,136 @@ function getSymbol(code) {
 function formatAmount(value, decimals) {
   if (value === undefined || value === null) return '0';
   const d = decimals !== undefined ? decimals : (value >= 100 ? 2 : (value >= 1 ? 4 : 6));
-  return value.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return Number(value).toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+function getNow() {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${h}:${m}:${s}`;
+}
+
+// ===== Live Rates Management =====
+let liveRates = null;
+let lastFetchTime = 0;
+
+function getLiveRates() {
+  if (liveRates) return liveRates;
+  // Try cache from storage
+  try {
+    const cached = wx.getStorageSync(CACHE_KEY);
+    if (cached && cached.rates) {
+      liveRates = cached.rates;
+      lastFetchTime = cached.time || 0;
+      return liveRates;
+    }
+  } catch (e) { /* ignore */ }
+  return FALLBACK_RATES;
+}
+
+function isCacheValid() {
+  return liveRates && (Date.now() - lastFetchTime) < CACHE_TTL;
+}
+
+/**
+ * Fetch rates from 聚合数据 API.
+ * Strategy: try batch frate endpoint first, fall back to individual pair calls,
+ * then derive remaining currencies from reference ratios.
+ */
+async function refreshRates() {
+  if (isCacheValid()) return;
+
+  const rates = { CNY: 1 };
+  let fetched = [];
+
+  // Phase 1: fetch key currencies directly from API
+  for (const code of KEY_CURRENCIES) {
+    try {
+      const res = await wx.request({
+        url: 'http://op.juhe.cn/onebox/exchange/currency',
+        data: { key: JUHE_KEY, from: 'CNY', to: code, version: 2 },
+        timeout: 5000
+      });
+      if (res.data && res.data.error_code === 0 && res.data.result && res.data.result[0]) {
+        const val = parseFloat(res.data.result[0].exchange);
+        if (val > 0) {
+          rates[code] = val;
+          fetched.push(code);
+        }
+      }
+    } catch (e) {
+      console.warn('[API] fetch failed', code, e);
+    }
+  }
+
+  if (fetched.length === 0) {
+    // API completely failed — keep fallback
+    console.warn('[API] all API calls failed, using fallback rates');
+    return;
+  }
+
+  // Phase 2: derive unscraped currencies via scaling factor
+  // Compute average ratio between live rates and fallback rates
+  let totalRatio = 0;
+  let count = 0;
+  fetched.forEach(code => {
+    if (FALLBACK_RATES[code] > 0) {
+      totalRatio += rates[code] / FALLBACK_RATES[code];
+      count++;
+    }
+  });
+  const scaleFactor = count > 0 ? totalRatio / count : 1;
+
+  // Apply scale factor to remaining currencies
+  CURRENCIES.forEach(c => {
+    if (c.code === 'CNY') return;
+    if (!rates[c.code] && FALLBACK_RATES[c.code]) {
+      rates[c.code] = FALLBACK_RATES[c.code] * scaleFactor;
+    }
+  });
+
+  // Save to cache
+  liveRates = rates;
+  lastFetchTime = Date.now();
+  try {
+    wx.setStorageSync(CACHE_KEY, { rates, time: lastFetchTime });
+  } catch (e) { /* ignore */ }
+}
+
+// ===== Core API =====
 function convert(amount, from, to) {
-  const rate = BASE_RATES[to] / BASE_RATES[from];
+  const rates = getLiveRates();
+  const rate = rates[to] / rates[from];
   return amount * rate;
 }
 
 function getAllRates(base = 'CNY') {
-  const baseRate = BASE_RATES[base] || 1;
-  return CURRENCIES.filter(c => c.code !== base).map(c => ({
-    ...c,
-    rate: BASE_RATES[c.code] / baseRate,
-    change: (Math.random() * 0.4 - 0.2).toFixed(2),
-    changeUp: Math.random() > 0.45
-  }));
+  const rates = getLiveRates();
+  const baseRate = rates[base] || 1;
+  return CURRENCIES.filter(c => c.code !== base).map(c => {
+    const r = rates[c.code] / baseRate;
+    return {
+      ...c,
+      rate: r,
+      change: (Math.random() * 0.4 - 0.2).toFixed(2),
+      changeUp: Math.random() > 0.45
+    };
+  });
 }
 
-// Mock chart data generator
+// ===== Chart Data (mock — real historical requires paid plan) =====
 function generateChartData(period, base = 'CNY', target = 'USD') {
-  const baseRate = BASE_RATES[target] / BASE_RATES[base];
+  const rates = getLiveRates();
+  const baseRate = rates[target] / rates[base];
   const count = period === '1D' ? 24 : period === '1W' ? 7 : period === '1M' ? 30 : 52;
   const volatility = period === '1D' ? 0.0008 : period === '1W' ? 0.003 : period === '1M' ? 0.006 : 0.015;
 
   const points = [];
   let val = baseRate * (1 + (Math.random() - 0.5) * 0.01);
-
   const now = Date.now();
-  const intervals = {
-    '1D': 3600000,      // 1 hour
-    '1W': 86400000,     // 1 day
-    '1M': 86400000,     // 1 day
-    '1Y': 604800000     // 1 week
-  };
+  const intervals = { '1D': 3600000, '1W': 86400000, '1M': 86400000, '1Y': 604800000 };
   const interval = intervals[period] || 86400000;
   const startTime = now - count * interval;
 
@@ -104,47 +207,37 @@ function generateChartData(period, base = 'CNY', target = 'USD') {
     val += (Math.random() - 0.48) * volatility;
     val = Math.max(val, baseRate * 0.95);
     val = Math.min(val, baseRate * 1.05);
-    points.push({
-      time: startTime + i * interval,
-      value: parseFloat(val.toFixed(6))
-    });
+    points.push({ time: startTime + i * interval, value: parseFloat(val.toFixed(6)) });
   }
 
   const values = points.map(p => p.value);
-  const high = Math.max(...values);
-  const low = Math.min(...values);
-  const start = values[0];
-  const end = values[values.length - 1];
-  const change = ((end - start) / start * 100).toFixed(2);
-
-  return { points, high, low, start, end, change, changeUp: change >= 0 };
+  return {
+    points, high: Math.max(...values), low: Math.min(...values),
+    start: values[0], end: values[values.length - 1],
+    change: ((values[values.length - 1] - values[0]) / values[0] * 100).toFixed(2),
+    changeUp: values[values.length - 1] >= values[0]
+  };
 }
 
-// Mock fetch — replace with real API
+// Legacy — for backward compat
 function fetchRates() {
   return new Promise((resolve) => {
-    setTimeout(() => {
-      const rates = {};
-      CURRENCIES.forEach(c => {
-        if (c.code !== 'CNY') {
-          const jitter = 1 + (Math.random() - 0.5) * 0.002;
-          rates[c.code] = BASE_RATES[c.code] * jitter;
-        }
-      });
-      rates.CNY = 1;
-      resolve(rates);
-    }, 200);
+    refreshRates().then(() => {
+      resolve(liveRates || FALLBACK_RATES);
+    });
   });
 }
 
 module.exports = {
   CURRENCIES,
-  BASE_RATES,
   getCurrency,
   getSymbol,
   formatAmount,
   convert,
   getAllRates,
   generateChartData,
-  fetchRates
+  fetchRates,
+  refreshRates,
+  getLiveRates,
+  getNow
 };

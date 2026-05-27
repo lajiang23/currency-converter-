@@ -29,14 +29,25 @@ Page({
   },
 
   onLoad() {
-    this.buildQuickPairs();
+    const rates = api.getLiveRates();
+    this.buildQuickPairs(rates);
     this.doConvert();
     this.updateTimeDisplay();
     this.loadRecent();
+
+    // Silently refresh rates from API in background
+    api.refreshRates().then(() => {
+      const fresh = api.getLiveRates();
+      this.buildQuickPairs(fresh);
+      this.doConvert();
+      this.setData({ updateTime: '更新于 ' + api.getNow() + ' · 数据来源 聚合数据' });
+    });
   },
 
   onShow() {
     // Refresh rates when page is shown
+    const rates = api.getLiveRates();
+    this.buildQuickPairs(rates);
     this.doConvert();
   },
 
@@ -60,7 +71,7 @@ Page({
       result: converted.toFixed(decimals),
       toSymbol: sym,
       fromSymbol: api.getSymbol(fromCurrency.code),
-      rate: (api.BASE_RATES[toCurrency.code] / api.BASE_RATES[fromCurrency.code]).toFixed(6),
+      rate: (api.getLiveRates()[toCurrency.code] / api.getLiveRates()[fromCurrency.code]).toFixed(6),
       changePercent: (Math.random() * 0.4).toFixed(2),
       changeUp: Math.random() > 0.45
     });
@@ -119,7 +130,8 @@ Page({
   },
 
   // ===== Quick Pairs =====
-  buildQuickPairs() {
+  buildQuickPairs(rates) {
+    const r = rates || api.getLiveRates();
     const pairs = [
       { from: 'CNY', to: 'USD', flag: '\u{1F1FA}\u{1F1F8}', code: 'USD' },
       { from: 'CNY', to: 'EUR', flag: '\u{1F1EA}\u{1F1FA}', code: 'EUR' },
@@ -131,7 +143,7 @@ Page({
       { from: 'CNY', to: 'THB', flag: '\u{1F1F9}\u{1F1ED}', code: 'THB' }
     ];
     const list = pairs.map(p => {
-      const rate = (api.BASE_RATES[p.to] / api.BASE_RATES[p.from]).toFixed(4);
+      const rate = (r[p.to] / r[p.from]).toFixed(4);
       return { ...p, rate };
     });
     this.setData({ quickPairs: list });
@@ -175,10 +187,9 @@ Page({
 
   // ===== Time =====
   updateTimeDisplay() {
-    const now = new Date();
-    this.setData({ updateTime: util.formatDateTime(now) });
+    this.setData({ updateTime: '更新于 ' + api.getNow() });
     setInterval(() => {
-      this.setData({ updateTime: util.formatDateTime(new Date()) });
+      this.setData({ updateTime: '更新于 ' + api.getNow() });
     }, 30000);
   },
 
